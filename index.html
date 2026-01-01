@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Babai Barta | Secure Terminal</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -14,246 +14,236 @@
             --border-dim: #2a1216;
             --surface: #0e0e12;
             --text-primary: #e0e0e0;
+            --success: #00ff88;
         }
 
-        * { box-sizing: border-box; outline: none; }
-
-        body {
+        /* Essential Fix for Mobile: No dragging/scrolling */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        html, body {
             background-color: var(--bg-deep);
             color: var(--text-primary);
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column;
+            padding: 0;
+            width: 100vw;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Fixes the screen position */
+            position: fixed;
             text-transform: uppercase;
         }
 
+        /* --- Header --- */
         header {
+            height: 60px;
             border-bottom: 1px solid var(--border-dim);
-            padding: 15px 40px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #08080a;
-            z-index: 10;
         }
 
         .logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.2rem;
             color: var(--accent-red);
-            letter-spacing: 3px;
-            margin: 0;
+            letter-spacing: 2px;
             font-weight: 700;
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            flex-grow: 1;
-            background: var(--border-dim);
-            gap: 1px;
-            position: relative;
+        .timer {
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 4px 10px;
         }
 
+        /* --- Main Layout Grid --- */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px; /* Desktop Viewport */
+            height: calc(100vh - 80px); /* Subtract Header/Footer */
+            background: var(--border-dim);
+            gap: 1px;
+        }
+
+        /* Responsive Grid for Mobile */
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; grid-template-rows: 1fr 250px; overflow-y: auto; }
+        }
+
+        /* --- Video Stage --- */
         .main-stage {
             background: var(--bg-deep);
-            padding: 25px;
+            padding: 15px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-content: center;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
         }
 
         .video-wrapper {
             position: relative;
             border: 1px solid var(--border-dim);
             background: #000;
-            aspect-ratio: 16/9;
+            overflow: hidden;
         }
 
-        .video-wrapper.active { border-color: var(--accent-red); box-shadow: 0 0 20px rgba(255, 27, 68, 0.1); }
+        .video-wrapper.active { border-color: var(--accent-red); border-width: 1px; }
 
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        .video-label {
+        .v-label {
             position: absolute; bottom: 0; left: 0;
-            background: var(--accent-red); color: #fff;
-            padding: 2px 12px; font-size: 0.7rem; font-weight: bold;
+            background: var(--accent-red); color: white;
+            padding: 2px 10px; font-size: 0.7rem; font-weight: bold;
         }
 
+        /* --- Practical Sidebar --- */
         .side-bar {
             background: var(--surface);
-            padding: 30px 20px;
-            display: flex; flex-direction: column; gap: 25px;
+            padding: 20px;
+            display: flex; flex-direction: column; gap: 20px;
         }
 
-        .section-header {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem; color: var(--accent-red);
-            margin-bottom: 15px; border-left: 3px solid var(--accent-red);
-            padding-left: 10px;
+        .module-title {
+            font-family: 'Orbitron'; font-size: 0.7rem; color: #555;
+            margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+        }
+        .module-title::after { content: ""; flex-grow: 1; height: 1px; background: var(--border-dim); }
+
+        .input-sharp {
+            background: #000; border: 1px solid var(--border-dim);
+            color: var(--accent-red); padding: 12px; font-family: 'Orbitron';
+            width: 100%; text-align: center; margin-bottom: 5px;
         }
 
-        .btn-sharp {
-            background: transparent; border: 1px solid var(--border-dim);
-            color: var(--text-primary); padding: 14px;
-            font-family: 'Rajdhani', sans-serif; font-weight: 600;
-            cursor: pointer; text-align: left; transition: 0.2s;
-            width: 100%; margin-bottom: 8px;
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        .btn-ctrl {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-dim);
+            color: var(--text-primary);
+            padding: 12px 5px; font-family: 'Rajdhani'; font-weight: 700;
+            cursor: pointer; font-size: 0.7rem; transition: 0.2s;
         }
 
-        .btn-sharp:hover { border-color: var(--accent-red); background: rgba(255, 27, 68, 0.08); }
-        
-        .chat-console {
-            position: absolute;
-            bottom: -350px; left: 25px; width: 400px; height: 350px;
-            background: var(--surface);
-            border: 1px solid var(--accent-red);
-            transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column;
-            z-index: 5;
-        }
+        .btn-ctrl:hover { border-color: var(--accent-red); background: rgba(255, 27, 68, 0.05); }
+        .btn-ctrl.active { border-color: var(--accent-red); color: var(--accent-red); }
 
-        .chat-console.open { bottom: 0; }
-
-        .chat-header {
+        .btn-main {
             background: var(--accent-red); color: white;
-            padding: 10px; font-family: 'Orbitron'; font-size: 0.8rem;
-            display: flex; justify-content: space-between; cursor: pointer;
+            border: none; padding: 15px; font-family: 'Orbitron';
+            font-weight: bold; cursor: pointer; font-size: 0.8rem;
         }
 
-        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; font-size: 0.85rem; color: #aaa; }
-
-        .chat-input-area { border-top: 1px solid var(--border-dim); padding: 10px; display: flex; gap: 5px; }
-
-        .chat-input { background: #000; border: 1px solid var(--border-dim); color: white; padding: 8px; flex-grow: 1; font-family: 'Rajdhani'; }
-
+        /* --- Footer --- */
         footer {
-            padding: 10px 40px; font-size: 0.7rem; color: #444;
+            height: 20px; padding: 0 20px; font-size: 0.6rem; color: #444;
             border-top: 1px solid var(--border-dim); background: #050506;
-            display: flex; justify-content: space-between;
-        }
-
-        .high-contrast { filter: contrast(1.2) brightness(1.1); }
-
-        /* Notification Toast */
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--accent-red); color: white; padding: 10px 25px;
-            font-family: 'Orbitron'; font-size: 0.8rem; display: none; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
         }
     </style>
 </head>
-<body id="appBody">
-
-    <div id="toast">LINK COPIED TO CLIPBOARD</div>
+<body>
 
     <header>
         <h1 class="logo">BABAI BARTA</h1>
-        <div style="font-size: 0.75rem; letter-spacing: 2px;">
-            STATUS: <span id="statusText" style="color: var(--accent-red);">READY</span>
-        </div>
+        <div class="timer" id="clock">00:00:00</div>
     </header>
 
     <div class="container">
         <section class="main-stage">
             <div class="video-wrapper active">
                 <video id="localVideo" autoplay muted playsinline></video>
-                <div class="video-label">BABAI (HOST)</div>
+                <div class="v-label">LOCAL_FEED: BABAI</div>
             </div>
             <div class="video-wrapper">
                 <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label">REMOTE NODE</div>
-            </div>
-
-            <div class="chat-console" id="chatBox">
-                <div class="chat-header" onclick="toggleChat()">
-                    <span>BARTA_CONSOLE</span>
-                    <span>_</span>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    SYSTEM: SECURE CHANNEL ESTABLISHED.
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="TYPE MESSAGE...">
-                    <button class="btn-sharp" style="width: auto; padding: 8px 15px; margin: 0;" onclick="sendMessage()">SEND</button>
-                </div>
+                <div class="v-label">REMOTE_NODE: WAITING</div>
             </div>
         </section>
 
         <aside class="side-bar">
-            <div>
-                <div class="section-header">COMMUNICATION</div>
-                <button class="btn-sharp" onclick="initiateLink()">INITIATE PEER LINK</button>
-                <button class="btn-sharp" onclick="copyInvite()">GENERATE INVITATION</button>
-                <button class="btn-sharp" onclick="toggleChat()">TOGGLE CONSOLE</button>
+            <div class="module">
+                <div class="module-title">ACCESS PROTOCOL</div>
+                <input type="text" id="secretCode" class="input-sharp" placeholder="SECRET_CODE">
+                <button class="btn-main" onclick="activate()" style="width: 100%;">CONNECT LINK</button>
             </div>
-            <div>
-                <div class="section-header">INTERFACE</div>
-                <button class="btn-sharp" onclick="toggleFullScreen()">FULL SCREEN</button>
-                <button class="btn-sharp" id="contrastBtn" onclick="toggleContrast()">HIGH CONTRAST: OFF</button>
+
+            <div class="module">
+                <div class="module-title">HARDWARE</div>
+                <div class="action-grid">
+                    <button class="btn-ctrl" onclick="toggleMic(this)">MIC: ON</button>
+                    <button class="btn-ctrl" onclick="toggleCam(this)">CAM: ON</button>
+                    <button class="btn-ctrl" onclick="toggleFS()">FULLSCREEN</button>
+                    <button class="btn-ctrl" onclick="alert('Chat Mode Active')">CONSOLE</button>
+                </div>
             </div>
-            <button class="btn-sharp" style="margin-top:auto; color: var(--accent-red);" onclick="location.reload()">DISCONNECT</button>
+
+            <div class="module" style="margin-top: auto;">
+                <button class="btn-ctrl" style="width: 100%; border-color: #551a24; color: var(--accent-red);" onclick="location.reload()">
+                    TERMINATE SESSION
+                </button>
+            </div>
         </aside>
     </div>
 
     <footer>
         <span>&copy; 2026 BABAI. ALL RIGHTS RESERVED.</span>
-        <span>BARTA_PROTOCOL_V1</span>
+        <span>UID: 1000033040_SECURE</span>
     </footer>
 
     <script>
+        // Fixed Digital Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
+        }
+        setInterval(updateClock, 1000);
+
+        // Hardware Logic
         let localStream;
-        
         async function startSystem() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 document.getElementById('localVideo').srcObject = localStream;
-            } catch (e) { document.getElementById('statusText').innerText = "HARDWARE ERROR"; }
+            } catch (e) { console.error("Hardware Error"); }
         }
 
-        function copyInvite() {
-            const meetingID = Math.random().toString(36).substring(2, 10).toUpperCase();
-            const dummyLink = `https://babaibarta.net/join/${meetingID}`;
-            navigator.clipboard.writeText(dummyLink);
-            
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        function activate() {
+            const code = document.getElementById('secretCode').value;
+            if(!code) return alert("ENTER CODE");
+            alert("INITIATING LINK: " + code);
         }
 
-        function initiateLink() {
-            document.getElementById('statusText').innerText = "CONNECTING...";
-            setTimeout(() => { document.getElementById('statusText').innerText = "LINK ACTIVE"; }, 1500);
+        function toggleMic(btn) {
+            const track = localStream.getAudioTracks()[0];
+            track.enabled = !track.enabled;
+            btn.classList.toggle('active');
+            btn.innerText = track.enabled ? 'MIC: ON' : 'MIC: OFF';
         }
 
-        function toggleChat() { document.getElementById('chatBox').classList.toggle('open'); }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            if(input.value) {
-                const msgBox = document.getElementById('chatMessages');
-                msgBox.innerHTML += `<br><span style="color:var(--accent-red)">BABAI:</span> ${input.value}`;
-                input.value = '';
-                msgBox.scrollTop = msgBox.scrollHeight;
-            }
+        function toggleCam(btn) {
+            const track = localStream.getVideoTracks()[0];
+            track.enabled = !track.enabled;
+            btn.classList.toggle('active');
+            btn.innerText = track.enabled ? 'CAM: ON' : 'CAM: OFF';
         }
 
-        function toggleContrast() {
-            const body = document.getElementById('appBody');
-            const active = body.classList.toggle('high-contrast');
-            document.getElementById('contrastBtn').innerText = active ? "HIGH CONTRAST: ON" : "HIGH CONTRAST: OFF";
-        }
-
-        function toggleFullScreen() {
+        function toggleFS() {
             if (!document.fullscreenElement) document.documentElement.requestFullscreen();
             else document.exitFullscreen();
         }
 
+        // Prevent Mobile Dragging
+        document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+
         startSystem();
+        updateClock();
     </script>
 </body>
 </html>
+
